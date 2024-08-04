@@ -77,6 +77,16 @@ export default function Home() {
     await updateInventory()
   }
 
+  const plusItem = async(item) => {
+    const docRef = doc(collection(firestore, 'inventory'), item)
+    const docSnap = await getDoc(docRef)
+
+    const {quantity} = docSnap.data()
+
+    await setDoc(docRef, {quantity: quantity + 1})
+    await updateInventory()
+  }
+
   useEffect(()=> {
     updateInventory()
   }, [])
@@ -157,7 +167,7 @@ export default function Home() {
               <Typography variant="h5" color='#333' textAlign="center">{quantity}</Typography>
               <Stack direction="row" spacing={2}>
               <BlueButton variant='contained' onClick={()=>{
-                addItem(name)
+                plusItem(name)
               }} sx={{
                         minWidth: '30px',
                         padding: '4px',
