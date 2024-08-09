@@ -1,6 +1,8 @@
 'use client'
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/router';
+import { auth } from '@/firebase';
+import { useAuthState } from 'react-firebase-hooks/auth'
 import {firestore} from '@/firebase'
 import { Box, Modal, Typography, Stack, TextField, Button, styled, Divider, InputAdornment } from "@mui/material";
 import { collection, deleteDoc, getDoc, getDocs, query, setDoc, doc } from "firebase/firestore";
@@ -27,6 +29,10 @@ export default function Home() {
   const [itemName, setitemName] = useState('')
   const [itemQuantity, setItemQuantity] = useState(1)
   const [searchBox, setSearchBox] = useState("")
+
+  useEffect(()=> {
+    updateInventory()
+  }, [])
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -88,10 +94,6 @@ export default function Home() {
   }
 
   useEffect(()=> {
-    updateInventory()
-  }, [])
-
-  useEffect(()=> {
     if(searchBox === "") {
       setFilteredPantry(inventory)
     } else {
@@ -111,7 +113,18 @@ export default function Home() {
     <Box display="flex" alignItems="center" justifyContent="flex-start" height="10vw" width="70vh">
       <Typography variant="h2" sx={{ marginRight: '50vw' }}>Pantry Pal</Typography>
     </Box>*/
-    <Box width="100%" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={2} bgcolor="#e8f5e9">
+    <Box sx={{
+      width: '100%',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 2,
+      backgroundImage: "url('/pantry_image.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }}>
       <Modal open={open} onClose={handleClose}>
       <Box position="absolute" top="50%" left="50%" width={400} sx={{transform: 'translate(-50%, -50%)'}} 
         bgcolor="white" border="2px solid black" boxShadow={24} p={4} display="flex" flexDirection="column" gap={3}>
@@ -133,9 +146,8 @@ export default function Home() {
         </Stack>
       </Box>
       </Modal>
-      <Typography variant="h2" sx={{margin: "2vw 0vw"}}>Pantry Peek</Typography>
       <Stack direction="row" spacing={2} mb={2}>
-      <TextField id="search-item" label="search" variant='outlined' value={searchBox} 
+      <TextField id="search-item" variant='outlined' value={searchBox} placeholder="search"
       onChange={(e) => setSearchBox(e.target.value)}
       InputProps={{
       startAdornment: (
@@ -144,20 +156,30 @@ export default function Home() {
         </InputAdornment>
       ),
       }}
-      sx={{ width: "300px" }} 
+      sx=
+        {{ 
+          width: "300px", 
+          '& .MuiOutlinedInput-root': {
+          backgroundColor: '#f0f0f0', // Background color
+          },
+          '& .MuiOutlinedInput-root.Mui-focused': {
+          backgroundColor: '#e0e0e0', // Background color when focused
+          color: 'blue',
+          },
+        }} 
       />
       <Button variant='contained' onClick={()=>{
         handleOpen()
       }}>Add New Item</Button>
       </Stack>
-      <Box>
-        <Box width="70vw" height="8vh" bgcolor="e8f5e9" display="flex" alignItems="center" justifyContent="space-between" padding={2}>
-          <Typography variant="h4" color="#333">Item</Typography>
-          <Typography variant="h4" color="#333">Quantity</Typography>
-          <Typography variant="h4" color="#333">Edit List</Typography>
+      <Box bgcolor="lightgrey">
+        <Box width="60vw" height="8vh" bgcolor="e8f5e9" display="flex" alignItems="center" justifyContent="space-between" padding={2}>
+          <Typography variant="h5" color="#333">Item</Typography>
+          <Typography variant="h5" color="#333">Quantity</Typography>
+          <Typography variant="h5" color="#333">Edit List</Typography>
         </Box>
         <Divider />
-      <Stack width="70vw" height="64vh" spacing={0} overflow="auto" bgcolor="e8f5e9">
+      <Stack width="60vw" height="50vh" spacing={0} overflow="auto" bgcolor="e8f5e9">
         {
           filteredPantry.map(({name, quantity})=>(
             <React.Fragment key={name}>
