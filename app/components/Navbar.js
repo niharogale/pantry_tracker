@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Box,List,ListItem,Link } from '@mui/material'
 import { UserAuth } from '../context/AuthContext'
-import { resolve } from 'styled-jsx/css';
 
 const Navbar = () => {
-    const {user, googleSignIn, logOut} = UserAuth();
-    const [loading, setLoading] = useState(true)
+    const {user, googleSignIn, logOut, loading} = UserAuth();
 
     const handleSignIn = async () => {
         try {
@@ -15,18 +13,9 @@ const Navbar = () => {
         }
     }
 
-    const handleSignOut = async () => {
-        try {
-            await logOut()
-        } catch(error) {
-            console.log("Logout Error: " + error)
-        }
-    }
-
     useEffect(()=> {
         const checkAuthentication = async ()=> {
             await new Promise((resolve) => setTimeout(resolve, 50))
-            setLoading(false)
         }
         checkAuthentication()
     }, [user])
@@ -50,7 +39,7 @@ const Navbar = () => {
       </List>) : (
         <Box>
             <p>Welcome, {user.displayName}</p>
-            <p onClick={handleSignOut}>Sign Out</p>
+            <p onClick={logOut}>Sign Out</p>
         </Box>
       )}
       

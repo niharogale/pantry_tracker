@@ -7,26 +7,37 @@ const AuthContext = createContext()
 export const AuthContextProvider = ({children}) => {
 
     const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     const googleSignIn = () => {
         const provider = new GoogleAuthProvider()
         signInWithPopup(auth, provider)
     }
 
-    const logOut = () => {
-        signOut(auth)
+    const logOut = async () => {
+        setLoading(true)
+        try {
+            await signOut(auth)
+        } catch(error) {
+            console.log("Logout error: ", error)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser)
+            setLoading(false)
         })
 
         return () => unsubscribe()
     }, [])
 
     return (
-        <AuthContext.Provider value={{user, googleSignIn, logOut}}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{user, googleSignIn, logOut, loading}}>
+            {children}
+        </AuthContext.Provider>
     )
 }
 
