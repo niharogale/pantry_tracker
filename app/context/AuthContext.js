@@ -10,30 +10,17 @@ export const AuthContextProvider = ({children}) => {
 
     const googleSignIn = () => {
         const provider = new GoogleAuthProvider()
-        signInWithRedirect(auth, provider)
+        signInWithPopup(auth, provider)
     }
 
     const logOut = () => {
         signOut(auth)
     }
 
-    const handleRedirectResult = async () => {
-        try {
-            const result = await getRedirectResult(auth)
-            if (result.user && result) {
-                setUser(result.user)
-            }
-        } catch (error) {
-            console.error('Error handling redirect result:', error)
-        }
-    }
-
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser)
         })
-
-        handleRedirectResult()
 
         return () => unsubscribe()
     }, [])
